@@ -5,7 +5,7 @@
         v-for="item in list"
         :key="item.id"
         @mouseenter="current = item"
-        :class="{ active: current && current.id === item.id }"
+        :class="{ active: current?.id && item.id === current.id }"
       >
         <RouterLink to="/category">{{ item.name }}</RouterLink>
         <template v-if="item.children">
