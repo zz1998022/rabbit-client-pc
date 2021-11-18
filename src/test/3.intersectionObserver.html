@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<div id="box">1</div>
+<script>
+  // 1. 创建监听对西昂
+  const box = document.getElementById('box');
+  const observer = new IntersectionObserver(([{isIntersecting}]) => {
+    // 2.指定监听的元素
+    console.log(isIntersecting);
+    // 停止监听
+    observer.unobserve(box);
+  });
+  observer.observe(box);
+</script>
+</body>
+</html>
