@@ -2,7 +2,7 @@
   <AppLayout v-bind="$attrs">
     <div class="container">
       <!--
-          由于 category.list 一开始是假数据 我们从中查询不到我们需要的数据
+          由于 category.js.list 一开始是假数据 我们从中查询不到我们需要的数据
           所以在此需要判断 topCategory 是否存在 如果存在再找name属性
         -->
       <XtxBread>
@@ -20,6 +20,13 @@
           height: '500px',
         }"
       />
+      <!-- 二级分类组件 -->
+      <ShowSubCategoryList
+        :subCategories="topCategory.children"
+        v-if="topCategory"
+      />
+      <!-- 二级分类商品推荐 -->
+      <RecommendGoods />
     </div>
   </AppLayout>
 </template>
@@ -30,9 +37,11 @@ import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { computed } from "vue";
 import useBanners from "@/hooks/useBanners";
+import ShowSubCategoryList from "@/views/category/components/ShowSubCategoryList";
+import RecommendGoods from "@/views/category/components/RecommendGoods";
 export default {
   name: "TopCategoryPage",
-  components: { AppLayout },
+  components: { ShowSubCategoryList, AppLayout, RecommendGoods },
   setup() {
     const topCategory = useCategory();
     // banners 轮播数据
