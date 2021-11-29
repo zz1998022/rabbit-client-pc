@@ -1,5 +1,5 @@
 <template>
-  <RouterLink to="/" class="goods-item">
+  <RouterLink :to="`/goods/${goods.id}`" class="goods-item">
     <img :src="goods.picture" alt="" />
     <p class="name ellipsis">{{ goods.name }}</p>
     <p class="desc ellipsis">{{ goods.desc }}</p>
@@ -12,7 +12,7 @@ export default {
   name: "GoodsItem",
   props: {
     goods: {
-      type: Array,
+      type: Object,
       default: () => {},
     },
   },

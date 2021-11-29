@@ -6,7 +6,10 @@ import axios from "axios";
 import store from "@/store";
 import router from "@/router";
 
-const baseURL = "http://pcapi-xiaotuxian-front-devtest.itheima.net";
+// 线上环境: https://apipc-xiaotuxian-front.itheima.net/
+// 开发环境: http://pcapi-xiaotuxian-front-devtest.itheima.net/
+
+const baseURL = "https://apipc-xiaotuxian-front.itheima.net/";
 
 const instanceWithToken = axios.create({ baseURL });
 const instanceWithoutToken = axios.create({ baseURL });
@@ -58,7 +61,7 @@ export function generateRequestConfig(url, method, data) {
   return {
     url,
     method,
-    [method === "get" ? "params" : data]: data,
+    [method === "get" ? "params" : "data"]: data,
   };
 }
 
@@ -67,7 +70,7 @@ export function requestWithToken(url, method, data) {
   return instanceWithToken({
     url,
     method,
-    [method === "get" ? "params" : data]: data,
+    [method === "get" ? "params" : "data"]: data,
   });
 }
 
@@ -76,6 +79,6 @@ export function requestWithoutToken(url, method, data) {
   return instanceWithToken({
     url,
     method,
-    [method === "get" ? "params" : data]: data,
+    [method === "get" ? "params" : "data"]: data,
   });
 }
