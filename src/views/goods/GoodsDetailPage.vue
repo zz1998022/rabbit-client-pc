@@ -31,6 +31,16 @@
               :skus="goodsDetail.skus"
               :specs="goodsDetail.specs"
             />
+            <!-- 商品数量组件 -->
+            <XtxNumberBox
+              label="数量"
+              v-model="goodsCount"
+              :max="goodsDetail.inventory"
+            />
+            <!-- 加入购物车 -->
+            <XtxButton type="primary" style="margin-top: 15px"
+              >加入购物车</XtxButton
+            >
           </div>
         </div>
         <!-- 商品推荐 -->
@@ -39,12 +49,18 @@
         <div class="goods-footer">
           <div class="goods-article">
             <!-- 商品+评价 -->
-            <div class="goods-tabs"></div>
+            <GoodsTab />
             <!-- 注意事项 -->
-            <div class="goods-warn"></div>
+            <div class="goods-warn">
+              <GoodsWarn />
+            </div>
           </div>
           <!-- 24热榜 -->
-          <div class="goods-aside"></div>
+          <div class="goods-aside">
+            <GoodsHot :type="1" />
+            <GoodsHot :type="2" />
+            <GoodsHot :type="3" />
+          </div>
         </div>
       </div>
     </div>
@@ -54,16 +70,22 @@
 <script>
 import GoodsRelevant from "@/views/goods/components/GoodsRelevant";
 import AppLayout from "@/components/AppLayout";
-import { ref } from "vue";
+import { provide, ref } from "vue";
 import { getGoodsDetail } from "@/api/goods";
 import { useRoute } from "vue-router";
 import GoodsImages from "@/views/goods/components/GoodsImages";
 import GoodsSales from "@/views/goods/components/GoodsSales";
 import GoodsInfo from "@/views/goods/components/GoodsInfo";
 import GoodsSku from "@/views/goods/components/GoodsSku";
+import GoodsTab from "@/views/goods/components/GoodsTab";
+import GoodsHot from "@/views/goods/components/GoodsHot";
+import GoodsWarn from "@/views/goods/components/GoodsWarn";
 export default {
   name: "GoodsDetailPage",
   components: {
+    GoodsWarn,
+    GoodsHot,
+    GoodsTab,
     GoodsSku,
     GoodsInfo,
     GoodsSales,
@@ -75,13 +97,16 @@ export default {
     const { goodsDetail, getData } = useGoodsDetail();
     // 获取路由参数
     const route = useRoute();
+    // 用于储存用户选择的商品数量
+    const goodsCount = ref(0);
     getData(route.params.id);
     const onSpecChanged = (data) => {
       goodsDetail.value.price = data.price;
       goodsDetail.value.oldPrice = data.oldPrice;
       goodsDetail.value.inventory = data.inventory;
     };
-    return { goodsDetail, onSpecChanged };
+    provide("goodsDetail", goodsDetail);
+    return { goodsDetail, onSpecChanged, goodsCount };
   },
 };
 

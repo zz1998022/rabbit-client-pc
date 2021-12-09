@@ -4,6 +4,7 @@ import TopCategoryPage from "@/views/category/TopCategoryPage";
 import SubCategoryPage from "@/views/category/SubCategoryPage";
 import GoodsDetailPage from "@/views/goods/GoodsDetailPage";
 // const GoodsDetailPage = () => import("@/views/goods/GoodsDetailPage");
+const LoginPage = () => import("@/views/login/LoginPage");
 
 const routes = [
   {
@@ -13,6 +14,10 @@ const routes = [
   { path: "/category/:id", component: TopCategoryPage },
   { path: "/category/sub/:id", component: SubCategoryPage },
   { path: "/goods/:id", component: GoodsDetailPage },
+  {
+    path: "/login",
+    component: LoginPage,
+  },
 ];
 
 const router = createRouter({

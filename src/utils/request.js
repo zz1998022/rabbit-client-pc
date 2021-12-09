@@ -9,7 +9,7 @@ import router from "@/router";
 // 线上环境: https://apipc-xiaotuxian-front.itheima.net/
 // 开发环境: http://pcapi-xiaotuxian-front-devtest.itheima.net/
 
-const baseURL = "https://apipc-xiaotuxian-front.itheima.net/";
+const baseURL = "http://pcapi-xiaotuxian-front-devtest.itheima.net/";
 
 const instanceWithToken = axios.create({ baseURL });
 const instanceWithoutToken = axios.create({ baseURL });
