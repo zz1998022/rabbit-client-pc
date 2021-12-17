@@ -36,7 +36,7 @@ instanceWithToken.interceptors.response.use(
   },
   (error) => {
     // 如果服务器端返回的是表示失败的状态码 走这个回调函数
-    if (error.response.status) {
+    if (error.response.status === 401) {
       // 401 未授权
       // 1.跳转到登录页
       router

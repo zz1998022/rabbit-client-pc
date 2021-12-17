@@ -3,6 +3,8 @@ import HomePage from "@/views/home/HomePage";
 import TopCategoryPage from "@/views/category/TopCategoryPage";
 import SubCategoryPage from "@/views/category/SubCategoryPage";
 import GoodsDetailPage from "@/views/goods/GoodsDetailPage";
+const CartPage = () => import("@/views/cart/CartPage");
+const LoginCallbackPage = () => import("@/views/login/LoginCallbackPage");
 // const GoodsDetailPage = () => import("@/views/goods/GoodsDetailPage");
 const LoginPage = () => import("@/views/login/LoginPage");
 
@@ -18,6 +20,8 @@ const routes = [
     path: "/login",
     component: LoginPage,
   },
+  { path: "/login/callback", component: LoginCallbackPage },
+  { path: "/cart", component: CartPage },
 ];
 
 const router = createRouter({

@@ -9,20 +9,17 @@
         <i className="iconfont icon-search"></i>
         <input type="text" placeholder="搜一搜" />
       </div>
-      <div className="cart">
-        <a className="curr" href="#">
-          <i className="iconfont icon-cart"></i><em>2</em>
-        </a>
-      </div>
+      <AppHeaderCart />
     </div>
   </header>
 </template>
 
 <script>
 import AppHeaderNav from "@/components/AppHeaderNav";
+import AppHeaderCart from "@/components/AppHeaderCart";
 export default {
   name: "AppHeader",
-  components: { AppHeaderNav },
+  components: { AppHeaderCart, AppHeaderNav },
 };
 </script>
 

@@ -180,6 +180,7 @@ function sendDataToParent(specs, pathMap, skus, emit) {
   const selected = getSelected(specs).filter((item) => item);
   // 2. 判断用户选择的规格是否是完整的 如果是完整的才需要将数据传递到组件
   if (selected.length === specs.length) {
+    console.log(selected.length === specs.length);
     // 3. 获取规格id
     const skuId = pathMap[selected.join("_")];
     // 4. 根据 skuId 在所有可组合的规格集合中查找规格对象
@@ -194,7 +195,14 @@ function sendDataToParent(specs, pathMap, skus, emit) {
       oldPrice: target.oldPrice,
       // 商品的库存, 在用户选择商品数量的时候使用
       inventory: target.inventory,
+      // 用户选择的规格名称祖父穿
+      attrsText: target.specs
+        .map((spec) => `${spec.name}: ${spec.valueName}`)
+        .join(" "),
     });
+  } else {
+    console.log("xxx");
+    emit("onSpecHalfChanged");
   }
 }
 </script>

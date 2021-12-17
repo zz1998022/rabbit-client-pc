@@ -4,7 +4,12 @@
       <ul>
         <template v-if="user.profile.token">
           <li>
-            <a href="javascript:"><i class="iconfont icon-user"></i>周杰伦</a>
+            <a href="javascript:"
+              ><i class="iconfont icon-user"></i>{{ user.profile.account }}</a
+            >
+          </li>
+          <li>
+            <a href="javascript:" @click="logout">退出登录</a>
           </li>
         </template>
         <template v-else>
@@ -24,13 +29,21 @@
 </template>
 <script>
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 export default {
   name: "AppTopNav",
   setup() {
     const store = useStore();
+    const router = useRouter();
     const user = store.state.user;
-    return { user };
+    const logout = () => {
+      // 1.清除用户信息
+      store.commit("user/setUser", {});
+      // 2.跳转到登录
+      router.push("/login");
+    };
+    return { user, logout };
   },
 };
 </script>
