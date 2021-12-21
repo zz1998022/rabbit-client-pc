@@ -2,13 +2,13 @@
   <HomePanel title="热门品牌" subTitle="国际经典 品质保证" ref="target">
     <template v-slot:right>
       <a
-        href="javascript:"
         @click="toggle(-1)"
+        href="javascript:"
         class="iconfont icon-angle-left prev"
       ></a>
       <a
-        href="javascript:"
         @click="toggle(1)"
+        href="javascript:"
         class="iconfont icon-angle-right next"
       ></a>
     </template>
@@ -21,12 +21,12 @@
         >
           <li v-for="item in hotBrands" :key="item.id">
             <RouterLink to="/">
-              <img :src="item.logo" alt="" />
+              <img :src="item.picture" alt="" />
             </RouterLink>
           </li>
         </ul>
         <transition name="fade">
-          <div class="skeleton" v-if="!hotBrands">
+          <div v-if="!hotBrands" class="skeleton">
             <xtx-skeleton
               class="item"
               v-for="i in 5"
@@ -46,28 +46,31 @@
 <script>
 import HomePanel from "@/views/home/components/HomePanel";
 import useLazyData from "@/hooks/useLazyData";
-import { getHotBrands } from "@/api/home";
+import { getBrands } from "@/api/home";
 import { ref } from "vue";
 export default {
   name: "HomeBrand",
   components: { HomePanel },
   setup() {
+    // 懒加载热门品牌数据
     const { target, result: hotBrands } = useLazyData(() => {
-      return getHotBrands(10);
+      return getBrands(10);
     });
-    const { toggle, currentIndex } = useToggle();
-    return { target, hotBrands, toggle, currentIndex };
+    const { currentIndex, toggle } = useToggle();
+    return { target, hotBrands, currentIndex, toggle };
   },
 };
 
 function useToggle() {
-  // 切换索引
+  // 动画索引
   const currentIndex = ref(0);
-  // 控制切换索引
+  // 更改索引
   const toggle = (step) => {
-    // 计算索引;
+    // 计算目标索引
     const nextIndex = currentIndex.value + step;
+    // 控制索引范围;
     if (nextIndex < 0 || nextIndex > 1) return;
+    // 真正的更改索引
     currentIndex.value = nextIndex;
   };
   return { currentIndex, toggle };
@@ -120,7 +123,6 @@ function useToggle() {
     }
   }
 }
-
 .skeleton {
   width: 100%;
   display: flex;

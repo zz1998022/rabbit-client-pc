@@ -1,13 +1,17 @@
 <template>
-  <div class="home-category">
-    <ul class="menu" @mouseleave="current = null">
+  <div class="home-category" @mouseleave="current = null">
+    <ul class="menu" v-if="list">
+      <!--
+        current?.id 可选链操作符
+        if (current && current.id) {}
+      -->
       <li
+        :class="{ active: current?.id && item.id === current.id }"
+        @mouseenter="current = item"
         v-for="item in list"
         :key="item.id"
-        @mouseenter="current = item"
-        :class="{ active: current?.id && item.id === current.id }"
       >
-        <RouterLink to="/category">{{ item.name }}</RouterLink>
+        <RouterLink to="/">{{ item.name }}</RouterLink>
         <template v-if="item.children">
           <RouterLink to="/" v-for="child in item.children" :key="child.id">{{
             child.name
@@ -30,23 +34,21 @@
         </template>
       </li>
     </ul>
-    <div class="layer">
+    <div class="layer" v-if="current">
       <h4>分类商品推荐 <small>根据您的购买或浏览记录推荐</small></h4>
-      <!-- 商品推荐 -->
-      <ul v-if="current && current.goods">
+      <ul v-if="current.goods">
         <li v-for="item in current.goods" :key="item.id">
           <RouterLink to="/">
             <img :src="item.picture" alt="" />
             <div class="info">
               <p class="name ellipsis-2">{{ item.name }}</p>
-              <p class="desc ellipsis">{{ item.desc }}</p>
+              <p class="desc ellipsis">{{ item.description }}</p>
               <p class="price"><i>¥</i>{{ item.price }}</p>
             </div>
           </RouterLink>
         </li>
       </ul>
-      <!-- 品牌推荐 -->
-      <ul v-if="current && current.brands">
+      <ul v-if="current.brands">
         <li class="brand" v-for="item in current.brands" :key="item.id">
           <RouterLink to="/">
             <img :src="item.logo" alt="" />
@@ -62,13 +64,6 @@
       </ul>
     </div>
   </div>
-  <XtxSkeleton
-    animated="fade"
-    width="60px"
-    height="18px"
-    bg="rgba(255,255,255,0.2)"
-    style="margin-right: 5px"
-  ></XtxSkeleton>
 </template>
 
 <script>
@@ -79,35 +74,33 @@ import { getBrands } from "@/api/home";
 export default {
   name: "HomeCategory",
   setup() {
-    const { list, brand, current } = useHomeCategory();
-    return {
-      list,
-      brand,
-      current,
-    };
+    const { list, current } = useHomeCategory();
+    return { list, current };
   },
 };
+
 function useHomeCategory() {
   const store = useStore();
   const current = ref();
   const brand = ref({
     id: "brand",
     name: "品牌",
-    children: [{ id: "child-brand", name: "推荐品牌" }],
+    children: [{ name: "推荐品牌", id: "child-brand" }],
     brands: [],
   });
   getBrands().then((data) => {
     brand.value.brands = data.result;
   });
   const list = computed(() => {
-    const list = store.state.category.list.map((item) => ({
+    const result = store.state.category.list.map((item) => ({
       ...item,
       children: item.children ? item.children.slice(0, 2) : null,
     }));
-    list.push(brand.value);
-    return list;
+    result.push(brand.value);
+    return result;
   });
-  return { list, brand, current };
+
+  return { current, list };
 }
 </script>
 <style scoped lang="less">
@@ -156,24 +149,6 @@ function useHomeCategory() {
     ul {
       display: flex;
       flex-wrap: wrap;
-      li.brand {
-        height: 180px;
-        a {
-          align-items: flex-start;
-          img {
-            width: 120px;
-            height: 160px;
-          }
-          .info {
-            p {
-              margin-top: 8px;
-            }
-            .place {
-              color: #999;
-            }
-          }
-        }
-      }
       li {
         width: 310px;
         height: 120px;
@@ -215,6 +190,24 @@ function useHomeCategory() {
               i {
                 font-size: 16px;
               }
+            }
+          }
+        }
+      }
+      li.brand {
+        height: 180px;
+        a {
+          align-items: flex-start;
+          img {
+            width: 120px;
+            height: 160px;
+          }
+          .info {
+            p {
+              margin-top: 8px;
+            }
+            .place {
+              color: #999;
             }
           }
         }

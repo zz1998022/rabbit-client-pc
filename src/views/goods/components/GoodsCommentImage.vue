@@ -2,12 +2,12 @@
   <div class="goods-comment-image">
     <div class="list">
       <a
+        @click="preview = picture"
         href="javascript:"
-        v-for="item in pictures"
-        :key="item"
-        @click="preview = item"
+        v-for="picture in pictures"
+        :key="picture"
       >
-        <img :src="item" alt="" />
+        <img :src="picture" alt="" />
       </a>
     </div>
     <div class="preview" v-if="preview">
@@ -28,7 +28,6 @@ export default {
     },
   },
   setup() {
-    // 大图预览地址
     const preview = ref(null);
     return { preview };
   },

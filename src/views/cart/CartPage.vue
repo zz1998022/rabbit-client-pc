@@ -10,7 +10,15 @@
           <table>
             <thead>
               <tr>
-                <th><XtxCheckbox>全选</XtxCheckbox></th>
+                <th>
+                  <XtxCheckbox
+                    :modelValue="selectAllButtonStatus"
+                    @update:modelValue="
+                      $store.dispatch('cart/selectedAll', $event)
+                    "
+                    >全选</XtxCheckbox
+                  >
+                </th>
                 <th>商品信息</th>
                 <th>单价</th>
                 <th>数量</th>
@@ -20,8 +28,23 @@
             </thead>
             <!-- 有效商品 -->
             <tbody>
-              <tr v-for="item in effectiveGoodsList" :key="item.id">
-                <td><XtxCheckbox /></td>
+              <tr v-if="effectiveGoodsCount === 0">
+                <td colspan="6">
+                  <EmptyCart />
+                </td>
+              </tr>
+              <tr v-else v-for="item in effectiveGoodsList" :key="item.id">
+                <td>
+                  <XtxCheckbox
+                    :modelValue="item.selected"
+                    @update:modelValue="
+                      $store.dispatch('cart/updateGoodsOfCartBySkuId', {
+                        skuId: item.skuId,
+                        selected: $event,
+                      })
+                    "
+                  />
+                </td>
                 <td>
                   <div class="goods">
                     <RouterLink :to="`/goods/${item.id}`"
@@ -32,6 +55,10 @@
                         {{ item.name }}
                       </p>
                       <!-- 选择规格组件 -->
+                      <CartSku
+                        :skuId="item.skuId"
+                        :attrsText="item.attrsText"
+                      />
                     </div>
                   </div>
                 </td>
@@ -40,21 +67,37 @@
                   <p v-if="item.price - item.nowPrice > 0">
                     比加入时降价
                     <span class="red"
-                      >&yen;{{ item.price - item.nowPrice }}</span
+                      >&yen;{{ (item.price - item.nowPrice).toFixed(2) }}</span
                     >
                   </p>
                 </td>
                 <td class="tc">
-                  <XtxNumberBox></XtxNumberBox>
+                  <XtxNumberBox
+                    :max="item.stock"
+                    :modelValue="item.count"
+                    @update:modelValue="
+                      $store.dispatch('cart/updateGoodsOfCartBySkuId', {
+                        skuId: item.skuId,
+                        count: $event,
+                      })
+                    "
+                  ></XtxNumberBox>
                 </td>
                 <td class="tc">
                   <p class="f16 red">
-                    &yen;{{ (item.nowPrice * item.count).toFixed(2) }}
+                    &yen;{{ (item.count * Number(item.nowPrice)).toFixed(2) }}
                   </p>
                 </td>
                 <td class="tc">
                   <p><a href="javascript:">移入收藏夹</a></p>
-                  <p><a class="green" href="javascript:">删除</a></p>
+                  <p>
+                    <a
+                      @click="deleteGoodsOfCartBySkuId(item.skuId)"
+                      class="green"
+                      href="javascript:"
+                      >删除</a
+                    >
+                  </p>
                   <p><a href="javascript:">找相似</a></p>
                 </td>
               </tr>
@@ -75,7 +118,9 @@
                       <p class="name ellipsis">
                         {{ item.name }}
                       </p>
-                      <p class="attr">{{ item.attrsText }}</p>
+                      <p class="attr">
+                        {{ item.attrsText }}
+                      </p>
                     </div>
                   </div>
                 </td>
@@ -84,7 +129,9 @@
                 </td>
                 <td class="tc">{{ item.count }}</td>
                 <td class="tc">
-                  <p>&yen;{{ (item.nowPrice * item.count).toFixed(2) }}</p>
+                  <p>
+                    &yen;{{ (item.count * Number(item.nowPrice)).toFixed(2) }}
+                  </p>
                 </td>
                 <td class="tc">
                   <p><a class="green" href="javascript:">删除</a></p>
@@ -98,15 +145,23 @@
         <div class="action">
           <div class="batch">
             <XtxCheckbox>全选</XtxCheckbox>
-            <a href="javascript:">删除商品</a>
+            <a
+              @click="deleteGoodsOfCart('selectedGoodsList')"
+              href="javascript:"
+              >删除商品</a
+            >
             <a href="javascript:">移入收藏夹</a>
-            <a href="javascript:">清空失效商品</a>
+            <a @click="deleteGoodsOfCart('invalidGoodsList')" href="javascript:"
+              >清空失效商品</a
+            >
           </div>
           <div class="total">
             共 {{ effectiveGoodsCount }} 件商品，已选择
             {{ selectedGoodsCount }} 件，商品合计：
-            <span class="red">¥{{ effectiveGoodsPrice }}</span>
-            <XtxButton type="primary">下单结算</XtxButton>
+            <span class="red">¥{{ selectedGoodsPrice }}</span>
+            <XtxButton type="primary" @click="jumpToCheckout"
+              >下单结算</XtxButton
+            >
           </div>
         </div>
         <!-- 猜你喜欢 -->
@@ -120,19 +175,26 @@ import GoodsRelevant from "@/views/goods/components/GoodsRelevant";
 import AppLayout from "@/components/AppLayout";
 import { useStore } from "vuex";
 import { computed } from "vue";
+import EmptyCart from "@/views/cart/components/EmptyCart";
+import Confirm from "@/components/library/Confirm";
+import Message from "@/components/library/Message";
+import CartSku from "@/views/cart/components/CartSku";
+import { useRouter } from "vue-router";
 export default {
   name: "CartPage",
-  components: { GoodsRelevant, AppLayout },
+  components: { CartSku, EmptyCart, GoodsRelevant, AppLayout },
   setup() {
-    // 获取store对象
+    // 获取 store 对象
     const store = useStore();
-    // 更修本地购物车数据
+    // 获取到路由对象
+    const router = useRouter();
+    // 更新购物车中的商品数据
     store.dispatch("cart/updateGoodsBySkuId");
     // 获取有效商品列表
     const effectiveGoodsList = computed(
       () => store.getters["cart/effectiveGoodsList"]
     );
-    // 获取有效商品数量
+    // 获取有效商品的数量
     const effectiveGoodsCount = computed(
       () => store.getters["cart/effectiveGoodsCount"]
     );
@@ -141,25 +203,84 @@ export default {
       () => store.getters["cart/invalidGoodsList"]
     );
     // 获取用户选择的商品总价
-    const selectedGoodsList = computed(
+    const selectedGoodsPrice = computed(
       () => store.getters["cart/selectedGoodsPrice"]
     );
     // 获取用户选择的商品总数
     const selectedGoodsCount = computed(
       () => store.getters["cart/selectedGoodsCount"]
     );
-    // 获取商品总价
-    const effectiveGoodsPrice = computed(
-      () => store.getters["cart/effectiveGoodsPrice"]
+    // 获取全选按钮的状态
+    const selectAllButtonStatus = computed(
+      () => store.getters["cart/selectAllButtonStatus"]
     );
-
+    // 删除商品
+    const deleteGoodsOfCartBySkuId = (skuId) => {
+      // 当用户点击删除按钮的时候 和用户进行确认
+      // Confirm({
+      //   content: "您确定要删除购物车中的该商品吗",
+      //   // 当用户点击了确认按钮的时候
+      //   onSureButtonClick() {
+      //     // 执行删除操作
+      //     store.dispatch("cart/deleteGoodsOfCart", skuId);
+      //   },
+      // });
+      Confirm({
+        content: "您确定要删除购物车中的该商品吗",
+      })
+        .then(() => {
+          // 执行删除操作
+          store.dispatch("cart/deleteGoodsOfCart", skuId);
+        })
+        .catch(() => {
+          // alert("执行取消逻辑");
+        });
+    };
+    // 批量删除用户选择的商品、清空无效商品
+    const deleteGoodsOfCart = (flag) => {
+      // 确认框的提示内容
+      let content = "";
+      if (flag === "selectedGoodsList") {
+        if (selectedGoodsCount.value === 0) {
+          Message({ type: "warn", text: "至少要选中一件商品" });
+          return;
+        }
+        // 批量删除用户选择的商品
+        content = "您确定要删除选中的商品吗";
+      } else if (flag === "invalidGoodsList") {
+        // 清空无效商品
+        if (invalidGoodsList.value.length === 0) {
+          Message({ type: "warn", text: "没有无效商品" });
+          return;
+        }
+        content = "您确定要删除无效商品吗";
+      }
+      // 和用户进行确认
+      Confirm({ content }).then(() => {
+        // 当用户点击确认按钮的时候 执行删除操作
+        store.dispatch("cart/deleteManyGoodsOfCart", flag);
+      });
+    };
+    // 跳转到结算页面
+    const jumpToCheckout = () => {
+      // 判断购物车列表中是否存在用户选择的商品
+      if (selectedGoodsCount.value === 0) {
+        Message({ type: "warn", text: "请选择商品" });
+        return;
+      }
+      // 跳转到结算页面
+      router.push("/checkout/order");
+    };
     return {
-      selectedGoodsList,
-      selectedGoodsCount,
-      invalidGoodsList,
       effectiveGoodsList,
+      invalidGoodsList,
+      selectedGoodsPrice,
+      selectedGoodsCount,
       effectiveGoodsCount,
-      effectiveGoodsPrice,
+      selectAllButtonStatus,
+      deleteGoodsOfCartBySkuId,
+      deleteGoodsOfCart,
+      jumpToCheckout,
     };
   },
 };

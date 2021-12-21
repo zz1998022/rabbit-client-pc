@@ -57,7 +57,6 @@ export default {
     }
   }
 }
-
 .home-skeleton {
   top: 115px;
 }

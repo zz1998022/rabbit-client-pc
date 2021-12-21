@@ -8,10 +8,7 @@
 <script>
 export default {
   name: "XtxSkeleton",
-  // 使用的时候需要动态设置 高度，宽度，背景颜色，
-  mounted() {
-    console.log(111);
-  },
+  // 使用的时候需要动态设置 高度，宽度，背景颜色，动画效果
   props: {
     bg: {
       type: String,

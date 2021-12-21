@@ -1,10 +1,10 @@
 <template>
   <div class="xtx-number-box">
-    <div class="label">{{ label }}</div>
+    <div class="label" v-if="label">{{ label }}</div>
     <div class="number-box">
-      <a href="javascript:" @click="onCountChangeHandler(-1)">-</a>
+      <a href="javascript:" @click="onCountChangedHandler(-1)">-</a>
       <input type="text" readonly :value="count" />
-      <a href="javascript:" @click="onCountChangeHandler(+1)">+</a>
+      <a href="javascript:" @click="onCountChangedHandler(1)">+</a>
     </div>
   </div>
 </template>
@@ -31,7 +31,7 @@ export default {
     // 实现商品数量的双向数据绑定
     const count = useVModel(props, "modelValue", emit);
     // 当用户更改商品数量时
-    const onCountChangeHandler = (step) => {
+    const onCountChangedHandler = (step) => {
       // 计算即将要设置的商品数量
       const nextCount = count.value + step;
       // 对商品数量的范围进行限制
@@ -39,15 +39,16 @@ export default {
       if (nextCount < 1) {
         // 让商品数量等于1
         count.value = 1;
-        // 如果商品数量等于商品库存
+        // 如果商品数量大于商品库存
       } else if (nextCount > props.max) {
+        // 让商品数量等于商品库存
         count.value = props.max;
       } else {
-        // 商品数量在正常范围
+        // 商品数量处于正常范围内 直接设置即可
         count.value = nextCount;
       }
     };
-    return { count, onCountChangeHandler };
+    return { count, onCountChangedHandler };
   },
 };
 </script>

@@ -1,9 +1,9 @@
 <template>
   <div class="xtx-pagination">
-    <!-- 如果当前页大于一 表示有上一页 渲染上一页anniu -->
+    <!-- 如果当前页大于一 表示有上一页 渲染上一页按钮 -->
     <a
-      href="javascript:"
       v-if="currentPage > 1"
+      href="javascript:"
       @click="currentPage = currentPage - 1"
       >上一页</a
     >
@@ -11,25 +11,25 @@
     <span v-if="pageInfo.start > 1">...</span>
     <a
       :class="{ active: item === currentPage }"
+      :key="item"
+      @click="currentPage = item"
       v-for="item in pageInfo.pageNumberAry"
       href="javascript:"
-      @click="currentPage = item"
-      :key="item"
       >{{ item }}</a
     >
     <!-- 如果显示着的结束页码小于总页数 表示后面还有页码 渲染 -->
     <span v-if="pageInfo.end < pageInfo.totalPage">...</span>
     <!-- 如果当前页小于总页数 表示有下一页 渲染下一页按钮 -->
     <a
-      href="javascript:"
       v-if="currentPage < pageInfo.totalPage"
+      href="javascript:"
       @click="currentPage = currentPage + 1"
       >下一页</a
     >
   </div>
 </template>
 <script>
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { useVModel } from "@vueuse/core";
 
 export default {
@@ -43,20 +43,25 @@ export default {
       type: Number,
       default: 0,
     },
+    pageSize: {
+      type: Number,
+      default: 10,
+    },
   },
   setup(props, { emit }) {
+    // 当前页
     const currentPage = useVModel(props, "page", emit);
     // 总数据条数
     const total = computed(() => props.counts);
     // 每页显示的数据条树
-    const pageSize = ref(10);
+    const pageSize = computed(() => props.pageSize);
     // 页面中一次最多显示的页码数量
     const pageButtonMaxNumber = 5;
     // 页码的偏移量
     const pageOffset = Math.floor(pageButtonMaxNumber / 2);
     const pageInfo = computed(() => {
       // 计算总页数
-      const totalPage = Math.ceil(total.value / pageSize.value); // 2
+      const totalPage = Math.ceil(total.value / pageSize.value);
       // 计算显示着的开始页码值
       let start = currentPage.value - pageOffset;
       // 计算显示着的结束页码值
@@ -77,7 +82,7 @@ export default {
         let temp = end - pageButtonMaxNumber + 1;
         start = temp < 1 ? 1 : temp;
       }
-      // 声明存储页码的数组
+      // 声明存储页码的数组git l
       let pageNumberAry = [];
       // 遍历生成页码数组
       for (let i = start; i <= end; i++) {

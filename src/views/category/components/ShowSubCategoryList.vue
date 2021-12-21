@@ -3,10 +3,10 @@
     <h3>全部分类</h3>
     <ul>
       <li v-for="item in subCategories" :key="item.id">
-        <router-link :to="`/category/sub/${item.id}`">
+        <a href="javascript:">
           <img :src="item.picture" alt="" />
           <p>{{ item.name }}</p>
-        </router-link>
+        </a>
       </li>
     </ul>
   </div>
@@ -17,6 +17,7 @@ export default {
   props: {
     subCategories: {
       type: Array,
+      default: () => [],
     },
   },
 };

@@ -22,6 +22,7 @@ export default {
       type: Boolean,
       default: false,
     },
+    // 控制 是否还有更多数据可以加载 是否显示
     finished: {
       type: Boolean,
       default: false,

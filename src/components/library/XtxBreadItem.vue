@@ -1,6 +1,6 @@
 <template>
   <div class="xtx-bread-item">
-    <RouterLink v-if="path" to="/"><slot></slot></RouterLink>
+    <RouterLink v-if="path" :to="path"><slot /></RouterLink>
     <span v-else><slot /></span>
   </div>
 </template>
@@ -11,13 +11,12 @@ export default {
   props: {
     path: {
       type: String,
-      default: null,
     },
   },
 };
 </script>
 
-<style scoped lang="less">
+<style lang="less" scoped>
 .xtx-bread-item {
   a {
     color: #666;

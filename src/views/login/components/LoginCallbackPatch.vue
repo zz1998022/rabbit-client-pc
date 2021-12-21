@@ -33,12 +33,9 @@
           type="text"
           placeholder="请输入验证码"
         />
-        <span
-          :class="{ disabled: isActive }"
-          class="code"
-          @click="getMsgCode"
-          >{{ isActive ? `剩余${count}秒` : "发送验证码" }}</span
-        >
+        <span class="code" @click="getMsgCode">
+          {{ isActive ? `剩余${count}秒` : "发送验证码" }}
+        </span>
       </div>
       <div class="error" v-if="codeError">{{ codeError }}</div>
     </div>
@@ -78,7 +75,7 @@ import {
   mobile,
   password,
   rePassword,
-} from "@/utils/vee-validate-schema";
+} from "@/utils/vee-valiationSchema";
 import { getMsgCodeByRegister, registerAndBindQQ } from "@/api/user";
 import Message from "@/components/library/Message";
 import useCountDown from "@/hooks/useCountDown";
@@ -87,35 +84,36 @@ import useLoginAfter from "@/hooks/useLoginAfter";
 export default {
   name: "LoginCallbackBindPatch",
   props: {
-    unionId: String,
+    unionId: {
+      type: String,
+    },
   },
   setup(props) {
-    const { getMobileIsValidate, handleSubmit, ...rest } = useRegisterPatch();
-    const { start, count, isActive } = useCountDown();
+    const { handleSubmit, getMobileIsValidate, ...rest } = useRegisterPatch();
+    const { count, isActive, start } = useCountDown();
     const { loginSuccess, loginFail } = useLoginAfter();
     // 表单提交
     const onSubmit = handleSubmit(
       ({ checkUserAccount, mobile, code, password }) => {
-        // 向服务器发送请求并绑定新账号
+        // 向服务器端发送请求注册新账号并绑定新账号
         registerAndBindQQ({
           checkUserAccount,
           mobile,
           code,
           password,
           unionId: props.unionId,
-        })
-          .then(loginSuccess)
-          .catch(loginFail);
+        }).then(loginSuccess, loginFail);
       }
     );
+
     const getMsgCode = () => {
-      // 如果正在倒计时,阻止程序向下运行
+      // 如果正在倒计时, 阻止程序向下运行
       if (isActive.value) return;
       // 1. 验证用户是否输入手机号
       getMobileIsValidate()
         .then(({ isValid, mobile }) => {
           if (isValid) {
-            // 2. 发送验证码
+            // 向服务器端发送请求获取验证码
             return getMsgCodeByRegister(mobile);
           }
         })
@@ -126,6 +124,7 @@ export default {
         .catch(() => {
           Message({ type: "error", text: "验证码发送失败" });
         });
+      // 2. 发送验证码
       // 3. 用户提示
     };
     return { ...rest, onSubmit, getMsgCode, count, isActive };

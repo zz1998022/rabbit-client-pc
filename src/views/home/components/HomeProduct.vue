@@ -3,7 +3,7 @@
     <HomePanel :title="item.name" v-for="item in homeProducts" :key="item.id">
       <template v-slot:right>
         <div class="sub">
-          <RouterLink to="/" v-for="sub in item.children" :key="sub.id">{{
+          <RouterLink :key="sub.id" v-for="sub in item.children" to="/">{{
             sub.name
           }}</RouterLink>
         </div>
@@ -12,7 +12,7 @@
       <template v-slot:default>
         <div class="box">
           <RouterLink class="cover" to="/">
-            <img v-lazy="item.picture" alt="" />
+            <img src="" v-lazy="item.picture" alt="" />
             <strong class="label">
               <span>{{ item.name }}馆</span>
               <span>{{ item.saleInfo }}</span>
@@ -33,13 +33,13 @@
 import HomeGoods from "@/views/home/components/HomeGoods";
 import HomePanel from "@/views/home/components/HomePanel";
 import XtxMore from "@/components/library/XtxMore";
-import { getProduct } from "@/api/home";
 import useLazyData from "@/hooks/useLazyData";
+import { getProducts } from "@/api/home";
 export default {
   name: "HomeProduct",
   components: { XtxMore, HomePanel, HomeGoods },
   setup() {
-    const { target, result: homeProducts } = useLazyData(getProduct);
+    const { target, result: homeProducts } = useLazyData(getProducts);
     return { target, homeProducts };
   },
 };

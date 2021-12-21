@@ -5,30 +5,31 @@
       <div class="loading"></div>
     </div>
   </section>
+  <!-- 如果当前没有处于加载状态, 说明加载完成, 加载完成以后如果用户没有绑定手机号 -->
   <section class="container" v-if="!loading && !isBind">
     <nav class="tab">
       <a
+        @click="hasAccount = true"
         :class="{ active: hasAccount }"
         href="javascript:"
-        @click="hasAccount = true"
       >
         <i class="iconfont icon-bind"></i>
         <span>已有小兔鲜账号，请绑定手机</span>
       </a>
       <a
+        @click="hasAccount = false"
         :class="{ active: !hasAccount }"
         href="javascript:"
-        @click="hasAccount = false"
       >
         <i class="iconfont icon-edit"></i>
         <span>没有小兔鲜账号，请完善资料</span>
       </a>
     </nav>
     <div class="tab-content" v-if="hasAccount">
-      <LoginCallbackBindPhone :openid="unionid" />
+      <LoginCallbackBindPhone :unionId="unionId" />
     </div>
     <div class="tab-content" v-else>
-      <LoginCallbackBindPatch :unionId="unionid" />
+      <LoginCallbackBindPatch :unionId="unionId" />
     </div>
   </section>
   <LoginFooter />
@@ -51,44 +52,44 @@ export default {
     LoginHeader,
   },
   setup() {
-    const hasAccount = ref();
-    // 1.先假设QQ用户没有绑定小兔鲜账号
+    const hasAccount = ref(true);
+    // 1. 先假设QQ用户没有绑定小兔仙账号
     const isBind = ref(false);
-    // 2.loading状态
+    // 2. loading 状态
     const loading = ref(false);
     const { loginSuccess } = useLoginAfter();
+    // 用于存储 openid
+    const unionId = ref("");
     // 获取QQ登录用户的 openid
-    // 用于存储unionid
-    const unionid = ref("");
     // 1. 检测用户的登录状态
     if (window.QC.Login.check()) {
       // 更新loading状态
       loading.value = true;
       // 获取 openid
       window.QC.Login.getMe((openid) => {
-        console.log(openid);
-        unionid.value = openid;
-        // 向小兔鲜应用的服务器发送请求 检测小兔鲜账号
+        // 存储 openid
+        unionId.value = openid;
+        // 向小兔仙应用的服务器发送请求 检测小兔仙账号
         findAccountByOpenId({ unionId: openid })
-          // 发送请求
+          // 如果检测到 直接跳转到首页 登录成功
           .then((data) => {
-            // 如果监测到账号 会走 then 方法
-            loginSuccess(data);
+            // 更新加载状态
             loading.value = false;
+            // 更新绑定状态
             isBind.value = true;
+            loginSuccess(data);
           })
           .catch(() => {
             // 如果没有检测到账号走 catch 方法
+            // 更新加载状态
             loading.value = false;
+            // 更新绑定状态
             isBind.value = false;
           });
       });
-      // window.QC.api("get_user_info").success((response) => {
-      //   console.log(response);
-      // });
     }
-    // 2. 拿着access_token 向QQ互联发送请求获取用户的openid
-    return { hasAccount, loading, isBind, unionid };
+    // 2. 拿着 access_token 向QQ互联发送请求换取用户的openid
+    return { hasAccount, isBind, loading, unionId };
   },
 };
 </script>

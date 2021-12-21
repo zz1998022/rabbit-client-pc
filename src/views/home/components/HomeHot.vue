@@ -1,5 +1,5 @@
 <template>
-  <HomePanel title="人气推荐" sub-title="人气爆款 不容错过" ref="target">
+  <HomePanel title="人气推荐" subTitle="人气爆款 不容错过" ref="target">
     <ul class="goods-list" v-if="homeHot">
       <li v-for="item in homeHot" :key="item.id">
         <RouterLink to="/">
@@ -9,7 +9,7 @@
         </RouterLink>
       </li>
     </ul>
-    <transition>
+    <transition name="fade">
       <HomeSkeleton v-if="!homeHot" />
     </transition>
   </HomePanel>
@@ -25,10 +25,7 @@ export default {
   components: { HomeSkeleton, HomePanel },
   setup() {
     const { target, result: homeHot } = useLazyData(getHotGoods);
-    return {
-      target,
-      homeHot,
-    };
+    return { homeHot, target };
   },
 };
 </script>
@@ -56,7 +53,6 @@ export default {
     }
   }
 }
-
 .home-skeleton {
   top: 115px;
 }

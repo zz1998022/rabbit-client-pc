@@ -29,7 +29,7 @@
           <p>&yen;{{ effectiveGoodsPrice }}</p>
         </div>
         <XtxButton type="plain">
-          <RouterLink to="/cart"> 去购物车结算 </RouterLink>
+          <RouterLink to="/cart">去购物车结算</RouterLink>
         </XtxButton>
       </div>
     </div>
@@ -43,13 +43,13 @@ import { useRoute } from "vue-router";
 export default {
   name: "AppHeaderCart",
   setup() {
-    // 获取可购买的商品列表
+    // 获取 store 对象
     const store = useStore();
-    // 获取路由信息对象
+    //  获取路由信息对象
     const route = useRoute();
     // 检测当前是否是购物车页面
     const isCartPage = ref(route.path === "/cart");
-    // 获取可购买的商品数量
+    // 获取可购买的商品列表
     const effectiveGoodsList = computed(
       () => store.getters["cart/effectiveGoodsList"]
     );
@@ -57,7 +57,7 @@ export default {
     const effectiveGoodsCount = computed(
       () => store.getters["cart/effectiveGoodsCount"]
     );
-    // 可购买的商品价格
+    // 获取可购买的商品价格
     const effectiveGoodsPrice = computed(
       () => store.getters["cart/effectiveGoodsPrice"]
     );

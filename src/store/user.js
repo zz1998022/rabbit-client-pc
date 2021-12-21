@@ -21,17 +21,16 @@ const user = {
     };
   },
   mutations: {
-    // 设置用户信息
     setUser(state, payload) {
-      // 判断对象是否为空
+      // 判断 payload 对象是否为空
       if (Object.keys(payload).length !== 0) {
-        // 设置用户信息
+        // 对象非空 设置用户信息
         state.profile = {
           ...state.profile,
           ...payload,
         };
       } else {
-        // 清空用户信息
+        // 空对象 // 清空用户信息
         state.profile = {};
       }
     },

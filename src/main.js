@@ -4,6 +4,6 @@ import router from "./router";
 import store from "./store";
 import "normalize.css";
 import "@/assets/styles/common.less";
-import UI from "@/components/library";
+import library from "@/components/library";
 
-createApp(App).use(store).use(router).use(UI).mount("#app");
+createApp(App).use(store).use(router).use(library).mount("#app");

@@ -81,8 +81,9 @@
                 :class="{ disabled: isActive }"
                 class="code"
                 @click="getMsgCode"
-                >{{ isActive ? `剩余${count}秒` : "发送验证码" }}</span
               >
+                {{ isActive ? `剩余${count}秒` : "发送验证码" }}
+              </span>
             </div>
             <div class="error" v-if="codeError">
               <i class="iconfont icon-warning"></i> {{ codeError }}
@@ -113,6 +114,7 @@
           alt=""
         />
       </a>
+
       <div class="url">
         <a href="javascript:">忘记密码</a>
         <a href="javascript:">免费注册</a>
@@ -128,9 +130,13 @@ import {
   isAgree,
   mobile,
   password,
-} from "@/utils/vee-validate-schema";
+} from "@/utils/vee-valiationSchema";
 import { useField, useForm } from "vee-validate";
-import { getMsgCodeByMobileLogin, loginByAccount } from "@/api/user";
+import {
+  getMsgCodeByMobileLogin,
+  loginByAccount,
+  loginByMobile,
+} from "@/api/user";
 import Message from "@/components/library/Message";
 import useCountDown from "@/hooks/useCountDown";
 import useLoginAfter from "@/hooks/useLoginAfter";
@@ -144,40 +150,33 @@ export default {
     const { handleAccountFormSubmit, ...accountForm } =
       useAccountFormValidate();
     // 获取短信登录表单的验证相关数据
-    const { mobileIsValidate, msgFormHandleSubmit, ...msgForm } =
+    const { msgFormHandleSubmit, mobileIsValidate, ...msgForm } =
       useMsgFormValidate();
+    // 获取和倒计时相关的属性和方法
+    const { count, start, isActive } = useCountDown();
+    // 获取登录成功和登录失败之后要做的事情
+    const { loginSuccess, loginFail } = useLoginAfter();
     // 处理账号表单登录
     const onAccountFormSubmit = handleAccountFormSubmit(
       ({ account, password }) => {
         // 当前回调函数会在表单验证通过以后执行
         // values 表示用户在表单中输入的内容
         loginByAccount({ account, password })
-          .then((data) => {
-            loginSuccess(data);
-          })
-          .catch(() => {
-            loginFail();
-          });
+          .then(loginSuccess)
+          .catch(loginFail);
       }
     );
-    const { count, start, isActive } = useCountDown();
-    const { loginSuccess, loginFail } = useLoginAfter();
     // 处理短信登录表单
     const onMsgFormSubmit = msgFormHandleSubmit(({ mobile, code }) => {
       // 当前回调函数会在表单验证通过以后执行
       // values 表示用户在表单中输入的内容
-      loginByAccount({ mobile, code })
-        .then((data) => {
-          loginSuccess(data);
-        })
-        .catch(() => {
-          loginFail();
-        });
+      loginByMobile({ mobile, code }).then(loginSuccess, loginFail);
     });
     // 获取手机验证码
     const getMsgCode = async () => {
       // 1. 检查用户是否输入手机号
       let { isValid, mobile } = await mobileIsValidate();
+      // 判断用户是否输入了手机号
       if (isValid && !isActive.value) {
         // 2. 发送请求获取验证码
         try {
@@ -185,13 +184,15 @@ export default {
           await getMsgCodeByMobileLogin(mobile);
           // 用户提示
           Message({ type: "success", text: "验证码发送成功" });
+          // 3. 实现倒计时
           start(60);
         } catch (error) {
+          // 用户提示
           Message({ type: "error", text: "验证码发送失败" });
         }
       }
-      // 3. 实现倒计时
     };
+
     return {
       isMsgLogin,
       ...accountForm,
@@ -200,7 +201,6 @@ export default {
       onMsgFormSubmit,
       getMsgCode,
       count,
-      start,
       isActive,
     };
   },
@@ -264,6 +264,7 @@ function useMsgFormValidate() {
     let { valid } = await mobileValidate();
     return { isValid: valid, mobile: mobileField.value };
   };
+
   return {
     mobileField,
     mobileError,

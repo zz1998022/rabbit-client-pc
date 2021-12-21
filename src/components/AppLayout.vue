@@ -18,7 +18,6 @@ export default {
   setup() {
     const store = useStore();
     store.dispatch("category/getCategories");
-    return {};
   },
 };
 </script>

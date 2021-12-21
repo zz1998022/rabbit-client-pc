@@ -8,9 +8,7 @@
               ><i class="iconfont icon-user"></i>{{ user.profile.account }}</a
             >
           </li>
-          <li>
-            <a href="javascript:" @click="logout">退出登录</a>
-          </li>
+          <li><a @click="logout" href="javascript:">退出登录</a></li>
         </template>
         <template v-else>
           <li><RouterLink to="/login">请先登录</RouterLink></li>
@@ -40,7 +38,9 @@ export default {
     const logout = () => {
       // 1.清除用户信息
       store.commit("user/setUser", {});
-      // 2.跳转到登录
+      // 2. 清空本地购物车数据
+      store.commit("cart/setCart", []);
+      // 2. 跳转到登录页面
       router.push("/login");
     };
     return { user, logout };

@@ -1,6 +1,6 @@
 <template>
-  <ul className="app-header-nav">
-    <li className="home">
+  <ul class="app-header-nav">
+    <li class="home">
       <RouterLink to="/">首页</RouterLink>
     </li>
     <li
@@ -10,14 +10,14 @@
       v-for="item in category.list"
       :key="item.id"
     >
-      <router-link :to="`/category/${item.id}`">{{ item.name }}</router-link>
+      <RouterLink :to="`/category/${item.id}`">{{ item.name }}</RouterLink>
       <div class="layer" :class="{ open: item.open }">
         <ul>
           <li v-for="sub in item.children" :key="sub.id">
-            <router-link :to="`/category/sub/${sub.id}`">
+            <RouterLink :to="`/category/sub/${sub.id}`">
               <img :src="sub.picture" alt="" />
               <p>{{ sub.name }}</p>
-            </router-link>
+            </RouterLink>
           </li>
         </ul>
       </div>
@@ -65,6 +65,18 @@ export default {
       display: inline-block;
     }
 
+    &:hover {
+      > a {
+        color: @xtxColor;
+        border-bottom: 1px solid @xtxColor;
+      }
+
+      //> .layer {
+      //  height: 132px;
+      //  opacity: 1;
+      //}
+    }
+
     .layer {
       width: 1240px;
       background-color: #fff;
@@ -102,18 +114,6 @@ export default {
             }
           }
         }
-      }
-    }
-
-    &:hover {
-      > a {
-        color: @xtxColor;
-        border-bottom: 1px solid @xtxColor;
-      }
-
-      > .layer {
-        height: 132px;
-        opacity: 1;
       }
     }
   }

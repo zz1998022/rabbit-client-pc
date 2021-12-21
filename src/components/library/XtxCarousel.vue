@@ -3,7 +3,7 @@
     <ul class="carousel-body">
       <li
         class="carousel-item"
-        :class="{ fade: currentIndex === index }"
+        :class="{ fade: index === currentIndex }"
         v-for="(item, index) in carousels"
         :key="item.id"
       >
@@ -23,10 +23,10 @@
         </RouterLink>
       </li>
     </ul>
-    <a href="javascript:" @click="toggle(1)" class="carousel-btn prev"
+    <a @click="toggle(-1)" href="javascript:" class="carousel-btn prev"
       ><i class="iconfont icon-angle-left"></i
     ></a>
-    <a href="javascript:" @click="toggle(-1)" class="carousel-btn next"
+    <a @click="toggle(1)" href="javascript:" class="carousel-btn next"
       ><i class="iconfont icon-angle-right"></i
     ></a>
     <div class="carousel-indicator">
@@ -34,7 +34,7 @@
         @click="currentIndex = index"
         v-for="(item, index) in carousels"
         :key="item.id"
-        :class="{ active: currentIndex === index }"
+        :class="{ active: index === currentIndex }"
       ></span>
     </div>
   </div>
@@ -44,13 +44,14 @@
 import { onMounted, onUnmounted, ref } from "vue";
 
 export default {
+  name: "XtxCarousel",
   props: {
     carousels: {
       type: Array,
     },
     autoplay: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     duration: {
       type: Number,
@@ -59,11 +60,11 @@ export default {
   },
   setup(props) {
     const currentIndex = ref(0);
-    // 用于储存定时器
+    // 用于存储定时器
     let timer = null;
     // 开启轮播
     const start = () => {
-      if (props.autoplay) {
+      if (props.autoplay && props.carousels.length > 1) {
         timer = setInterval(() => {
           toggle(1);
         }, props.duration);
@@ -73,15 +74,19 @@ export default {
     const stop = () => {
       clearInterval(timer);
     };
-    // 组件挂载完成执行定时器
+    // 组件挂载完成后尝试开启自动轮播
     onMounted(start);
+    // 组件卸载后清除定时器
     onUnmounted(stop);
     const toggle = (step) => {
       const nextIndex = currentIndex.value + step;
-      // 如果没有上一张图片了显示最后一张
+      // 如果当前没有上一张图片了
       if (nextIndex < 0) {
+        // 显示最后一张
         currentIndex.value = props.carousels.length - 1;
+        // 如果没有下一张了
       } else if (nextIndex > props.carousels.length - 1) {
+        // 显示第一张
         currentIndex.value = 0;
       } else {
         currentIndex.value = nextIndex;
@@ -89,7 +94,6 @@ export default {
     };
     return { currentIndex, toggle, start, stop };
   },
-  name: "XtxCarousel",
 };
 </script>
 <style scoped lang="less">

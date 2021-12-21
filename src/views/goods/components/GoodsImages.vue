@@ -22,10 +22,10 @@
     </div>
     <ul class="small">
       <li
-        @mouseenter="currentIndex = index"
-        :class="{ active: currentIndex === index }"
         v-for="(item, index) in images"
         :key="item"
+        @mouseenter="currentIndex = index"
+        :class="{ active: currentIndex === index }"
       >
         <img :src="item" alt="" />
       </li>
@@ -46,41 +46,45 @@ export default {
   },
   setup() {
     const currentIndex = ref(0);
-    // 控制大图片容器和镜片容器的显示和隐藏
+    // 控制大图容器和镜片容器的显示和隐藏
     const show = ref(false);
     // 用于获取中图DOM对象
     const target = ref();
     // 用于获取鼠标和元素之间的关系
     const { isOutside, elementX, elementY } = useMouseInElement(target);
-    // 用于控制镜片的变化
+    // 用于控制镜片的位置
     const layerPosition = ref({ left: 0, top: 0 });
     // 用于控制大图位置
     const bgPosition = ref({ x: 0, y: 0 });
-    // 监听鼠标和元素之间关系的变化
+    // 监听鼠标和元素之间的关系的变化
     watch([isOutside, elementX, elementY], ([isOut, x, y]) => {
-      // console.log(x, y);
       if (isOut) {
         // 鼠标移出
         show.value = false;
       } else {
         // 鼠标移入
         show.value = true;
-        layerPosition.value = { left: x - 100, top: y - 100 };
+        // 控制镜片的位置
+        layerPosition.value = {
+          left: x - 100,
+          top: y - 100,
+        };
         // 控制镜片水平方向溢出
         if (layerPosition.value.left < 0) {
-          layerPosition.value["left"] = 0;
+          layerPosition.value.left = 0;
         } else if (layerPosition.value.left > 200) {
-          layerPosition.value["left"] = 200;
+          layerPosition.value.left = 200;
         }
         // 控制镜片垂直方向溢出
         if (layerPosition.value.top < 0) {
-          layerPosition.value["top"] = 0;
+          layerPosition.value.top = 0;
         } else if (layerPosition.value.top > 200) {
-          layerPosition.value["top"] = 200;
+          layerPosition.value.top = 200;
         }
+        // 设置背景大图位置
         bgPosition.value = {
-          x: layerPosition.value.left * -2,
-          y: layerPosition.value.top * -2,
+          x: -layerPosition.value.left * 2,
+          y: -layerPosition.value.top * 2,
         };
       }
     });

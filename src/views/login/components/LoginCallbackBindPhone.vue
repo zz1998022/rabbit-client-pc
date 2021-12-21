@@ -38,7 +38,7 @@
 <script>
 import { ref } from "vue";
 import { useField, useForm } from "vee-validate";
-import { mobile, code } from "@/utils/vee-validate-schema";
+import { mobile, code } from "@/utils/vee-valiationSchema";
 import { bindMobileAndQQ, getMsgCodeWhenBindQQ } from "@/api/user";
 import Message from "@/components/library/Message";
 import useCountDown from "@/hooks/useCountDown";

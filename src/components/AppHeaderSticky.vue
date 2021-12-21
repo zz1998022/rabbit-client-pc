@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ show: scrollTop > 78 }" class="app-header-sticky">
+  <div class="app-header-sticky" :class="{ show: scrollTop > 78 }">
     <div class="container" v-show="scrollTop > 78">
       <RouterLink to="/" class="logo" />
       <AppHeaderNav />
@@ -20,10 +20,6 @@ export default {
   components: { AppHeaderNav },
   setup() {
     const { y: scrollTop } = useWindowScroll();
-    console.log(scrollTop);
-    // watch(scrollTop, (oldVal, newVal) => {
-    //   console.log(oldVal, newVal);
-    // });
     return { scrollTop };
   },
 };

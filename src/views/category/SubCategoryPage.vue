@@ -124,7 +124,10 @@ function useGoodsList() {
       // 更新加载状态
       loading.value = false;
       // 如果当前页已经是最后一页了
-      if (reqParams.value.page === data.result.pages) {
+      if (
+        reqParams.value.page === data.result.pages ||
+        data.result.pages === 0
+      ) {
         finished.value = true;
       }
       // console.log(goodsList.value);

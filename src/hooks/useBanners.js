@@ -1,15 +1,17 @@
 import { ref } from "vue";
 import { getBanners } from "@/api/home";
 
-function useBanners() {
+export default function useBanners() {
+  // 用于存储轮播图数据
   const banners = ref();
+  // 用于获取轮播图数据的方法
+  // distributionSite 广告投放位置
   const getData = (distributionSite) => {
+    // 获取数据
     getBanners(distributionSite).then((data) => {
+      // 存储数据
       banners.value = data.result;
-      console.log(banners);
     });
   };
   return { banners, getData };
 }
-
-export default useBanners;

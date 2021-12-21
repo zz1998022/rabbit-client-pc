@@ -12,10 +12,9 @@ const store = createStore({
   },
   plugins: [
     createPersistedState({
-      // 储存在localStorage里面的key
-      key: "rabbit-client-pc",
-      // 指定将哪些模块中的数据同步到本地
       paths: ["user", "cart"],
+      // 指定数据存储在 localStorage 中的名字
+      key: "rabbit-client-pc",
     }),
   ],
 });
